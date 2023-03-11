@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -30,16 +31,30 @@ public class EmployeeV2ServiceImpl implements EmployeeService{
 
     @Override
     public List<Employee> getEmployees() {
-        return null;
+        List<EmployeeEntity> employeeEntityList = employeeRepository.findAll();
+        List<Employee> employees =
+                employeeEntityList.stream()
+                        .map(employeeEntity -> {
+                            //convert employeEntity to type Employee
+                            Employee employee = new Employee();
+                            BeanUtils.copyProperties(employeeEntity, employee);
+                            return employee;
+                        }).collect(Collectors.toList());
+        return employees;
     }
 
     @Override
     public Employee getEmployeeById(String id) {
-        return null;
+        EmployeeEntity employeeEntity
+                = employeeRepository.findById(id).get();
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeEntity, employee);
+        return employee;
     }
 
     @Override
     public String deleteEmployeeById(String id) {
-        return null;
+        employeeRepository.deleteById(id);
+        return "Employee with id: "+ id +" has been deleted from the database";
     }
 }
